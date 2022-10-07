@@ -1,5 +1,9 @@
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import React, { useState } from 'react';
+import {
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+} from 'firebase/auth';
+import React, { useEffect, useState } from 'react';
+import { Link, Navigate } from 'react-router-dom';
 import { auth } from './FirebaseConfig';
 
 const Register = () => {
@@ -20,30 +24,47 @@ const Register = () => {
     }
   };
 
+  const [user, setUser] = useState('');
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+  }, []);
+
   return (
     <>
-      <h1>新規登録</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>メールアドレス</label>
-          <input
-            name="email"
-            type="email"
-            value={registerEmail}
-            onChange={(e) => setRegisterEmail(e.target.value)}
-          />
-        </div>
-        <div>
-          <label>パスワード</label>
-          <input
-            name="password"
-            type="password"
-            value={registerPassword}
-            onChange={(e) => setRegisterPassword(e.target.value)}
-          />
-        </div>
-        <button>登録する</button>
-      </form>
+      {user ? (
+        <Navigate to={`/`} />
+      ) : (
+        <>
+          <h1>新規登録</h1>
+          <form onSubmit={handleSubmit}>
+            <div>
+              <label>メールアドレス</label>
+              <input
+                name="email"
+                type="email"
+                value={registerEmail}
+                onChange={(e) => setRegisterEmail(e.target.value)}
+              />
+            </div>
+            <div>
+              <label>パスワード</label>
+              <input
+                name="password"
+                type="password"
+                value={registerPassword}
+                onChange={(e) => setRegisterPassword(e.target.value)}
+              />
+            </div>
+            <button>登録する</button>
+            <p>
+              ログインは<Link to={`/login/`}>こちら</Link>
+            </p>
+          </form>
+        </>
+      )}
     </>
   );
 };
